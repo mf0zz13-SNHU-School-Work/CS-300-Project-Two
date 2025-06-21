@@ -9,7 +9,8 @@
 #include<vector>
 #include<fstream>
 #include<sstream>
-using namespace std;
+#include <algorithm>
+#include <cctype>
 
 using namespace std;
 
@@ -310,36 +311,48 @@ int main()
 {
 	bool exit = false;
 	int userInput = 0;
+	string fileName;
+	string courseName;
+
 	BST courses;
 	Parser parser;
 
+	cout << "Welcome to the course planner." << endl;
+
 	do
 	{
+		cout << endl;
 		cout << "1. Load Data Structure." << endl;
 		cout << "2. Print Course List." << endl;
 		cout << "3. Print Course." << endl;
 		cout << "9. Exit.\n" << endl;
 		cout << "What would you like to do? ";
 		cin >> userInput;
+		cin.ignore();
 
 		switch (userInput) {
 		case 1:
-			parser.ParseFile(courses, "CS 300 ABCU_Advising_Program_Input.csv");
+			cout << "What is the name of the file that contains the course data? ";
+			getline(cin, fileName);
+			parser.ParseFile(courses, fileName);
 			break;
 		case 2:
 			cout << "Here is a sample schedule:\n" << endl;
 			courses.PrintList();
-			cout << endl;
 			break;
 		case 3:
-			courses.Search("CSCI400");
+			cout << "What course do you want to know about? ";
+			cin >> courseName;
+			for (int i = 0; i < courseName.length(); i++)
+				courseName[i] = toupper(courseName[i]);
+			courses.Search(courseName);
 			break;
 		case 9:
 			exit = true;
 			cout << "Thank you for using the course planner!" << endl;
 			break;
 		default:
-			cout << ("{} is not a valid option.\n", userInput) << endl;
+			cout << userInput << " is not a valid option." << endl;;
 		}
 
 	} while (!exit);

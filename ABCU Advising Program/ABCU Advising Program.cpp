@@ -7,6 +7,9 @@
 
 #include <iostream>
 #include<vector>
+#include<fstream>
+#include<sstream>
+using namespace std;
 
 using namespace std;
 
@@ -112,6 +115,7 @@ private:
 	Node* addNode(Node* node, Course course);
 	void inOrder(Node* node);
 	void search(Node* node, string courseNumber);
+	int location(string line);
 
 public:
 	BST();
@@ -129,7 +133,7 @@ BST::Node* BST::addNode(Node* node, Course course) {
 
 	if (node == nullptr) // If the node is null then a new node is added to tree in current place
 		return new Node(course);
-	
+
 	// If course number is smaller than the current nodes course number traversal is to the left otherwise to the right
 	if (course.GetCourseNumber().compare(node->course.GetCourseNumber()) < 0)
 		node->left = addNode(node->left, course);
@@ -215,12 +219,82 @@ void BST::Search(string courseNumber) {
 	search(root, courseNumber);
 }
 
+class Parser {
+public:
+	void ParseFile(BST& tree, string filePath);
+	int subLocation(string line);
+};
 
+void Parser::ParseFile(BST& tree, string filePath) {
+	vector<string> courseNames;
+	try {
+		ifstream iFile;
+		string currLine;
+		iFile.open(filePath);
+		int lineCount = 0;
+
+		if (iFile.is_open()) {
+			while (iFile.good()) {
+				Course tempCourse;
+				getline(iFile, currLine);
+				if(iFile.eof())
+					break;
+				lineCount++;
+
+				int commaCount = 0;
+				for (int i = 0; i < currLine.length(); i++) {
+					if (currLine[i] == ',')
+						commaCount++;
+				}
+
+				if (commaCount < 3) {
+					cout << "Line " << lineCount << " is formatted incorrectly"<< endl;
+					continue;
+				}
+
+				tempCourse.SetCourseNumber(currLine.substr(0, subLocation(currLine)));
+				currLine = currLine.substr(subLocation(currLine) + 1, currLine.length());
+
+				tempCourse.SetCourseName(currLine.substr(0, subLocation(currLine)));
+				currLine = currLine.substr(subLocation(currLine) + 1, currLine.length());
+
+
+				while (currLine.length() > 1) {
+					tempCourse.SetPreReq(currLine.substr(0, subLocation(currLine)));
+					currLine = currLine.substr(subLocation(currLine) + 1, currLine.length());
+					if (currLine.find(",") == std::string::npos && currLine.length() != 0)
+					{
+						tempCourse.SetPreReq(currLine);
+						break;
+					}
+				}
+
+				tree.Add(tempCourse);
+			}
+		}
+		else {
+			cout << "File could not be opened";
+			return;
+		}
+
+		iFile.close();
+	}
+	catch (exception e) {
+		cout << "Exception: " << e.what() << endl;
+	}
+
+}
+
+int Parser::subLocation(string line) {
+	return line.find(',');
+}
 
 int main()
 {
 	bool exit = false;
 	int userInput = 0;
+	BST courses;
+	Parser parser;
 
 	do
 	{
@@ -233,20 +307,22 @@ int main()
 
 		switch (userInput) {
 		case 1:
-			// FIXME: Add Method to add data
+			parser.ParseFile(courses, "CS 300 ABCU_Advising_Program_Input.csv");
 			break;
 		case 2:
-			// FIXME: Add Method To Print Course List
+			cout << "Here is a sample schedule:\n" << endl;
+			courses.PrintList();
+			cout << endl;
 			break;
 		case 3:
-			// FIXME: Add Method To Print Course
+			courses.Search("CSCI400");
 			break;
 		case 9:
 			exit = true;
 			cout << "Thank you for using the course planner!" << endl;
 			break;
 		default:
-			cout << userInput << " is not a valid option.\n" << endl;
+			cout << ("{} is not a valid option.\n", userInput) << endl;
 		}
 
 	} while (!exit);

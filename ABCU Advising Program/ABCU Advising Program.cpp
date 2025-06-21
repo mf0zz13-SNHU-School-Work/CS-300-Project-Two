@@ -219,14 +219,22 @@ void BST::Search(string courseNumber) {
 	search(root, courseNumber);
 }
 
+/*
+	@brief Class that parses csv files and stores them in data structure.
+*/
 class Parser {
 public:
 	void ParseFile(BST& tree, string filePath);
 	int subLocation(string line);
 };
 
+/*
+	@brief Opens file at specified path and converts each line to an object and stores them in BST provided.
+	@param Reference to BST that records will be stored in.
+	@param File path that the data is stored at.
+*/
 void Parser::ParseFile(BST& tree, string filePath) {
-	vector<string> courseNames;
+	
 	try {
 		ifstream iFile;
 		string currLine;
@@ -235,30 +243,35 @@ void Parser::ParseFile(BST& tree, string filePath) {
 
 		if (iFile.is_open()) {
 			while (iFile.good()) {
-				Course tempCourse;
+				Course tempCourse; //Temp course object to store current lines information prior to storing in BST
 				getline(iFile, currLine);
-				if(iFile.eof())
-					break;
 				lineCount++;
 
+				// If at the end of the file the loop is broken
+				if(iFile.eof())
+					break;
+				
+				// Check to see if there are the minimum number of required values.
 				int commaCount = 0;
 				for (int i = 0; i < currLine.length(); i++) {
 					if (currLine[i] == ',')
 						commaCount++;
 				}
 
+				// Throw exception if line is missing data
 				if (commaCount < 3) {
-					cout << "Line " << lineCount << " is formatted incorrectly"<< endl;
-					continue;
+					throw runtime_error("Data is corrupt");
 				}
 
+				// Adding course number to object and then removing it from the string
 				tempCourse.SetCourseNumber(currLine.substr(0, subLocation(currLine)));
 				currLine = currLine.substr(subLocation(currLine) + 1, currLine.length());
 
+				// Adding course name to object and then removing it from the string
 				tempCourse.SetCourseName(currLine.substr(0, subLocation(currLine)));
 				currLine = currLine.substr(subLocation(currLine) + 1, currLine.length());
 
-
+				// Adding course prerequisites to object and then removing them from the string
 				while (currLine.length() > 1) {
 					tempCourse.SetPreReq(currLine.substr(0, subLocation(currLine)));
 					currLine = currLine.substr(subLocation(currLine) + 1, currLine.length());
@@ -273,8 +286,7 @@ void Parser::ParseFile(BST& tree, string filePath) {
 			}
 		}
 		else {
-			cout << "File could not be opened";
-			return;
+			throw runtime_error("File can not be opened");
 		}
 
 		iFile.close();
@@ -285,6 +297,11 @@ void Parser::ParseFile(BST& tree, string filePath) {
 
 }
 
+/*
+	@brief Checks a string to find the location of the first comma.
+	@param String that will be checked for a comma
+	@returns Integer specifying location of first comma
+*/
 int Parser::subLocation(string line) {
 	return line.find(',');
 }

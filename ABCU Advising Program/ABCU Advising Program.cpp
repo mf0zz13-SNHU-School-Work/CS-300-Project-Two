@@ -44,28 +44,41 @@ public:
 		this->preReqs.push_back(courseName);
 	}
 
+	/*
+		@brief Returns the string course number.
+	*/
 	string GetCourseNumber() {
 		return courseNumber;
 	}
 
-	string PrintCourseNumber() {
+	/*
+		@brief Prints the course number.
+	*/
+	void PrintCourseNumber() {
 		cout << courseNumber;
 	}
 
-	string PrintCourseName() {
+	/*
+		@brief Prints the course name.
+	*/
+	void PrintCourseName() {
 		cout << courseName;
 	}
 
-	vector<string> PrintPreReqs() {
+	/*
+		@brief Prints a list of the prerequisites.
+	*/
+	void PrintPreReqs() {
 		int size = preReqs.size();
 
 		for (int i = 0; i < size; i++) {
 			cout << preReqs[i];
-			if (i != size - 1)
+			if (i != size - 1) // If the preReq is not the last one a comma is printed
 				cout << ", ";
 		}
 	}
 
+	// Default constructor
 	Course() {
 		courseNumber = "unknown";
 		courseName = "unknown";
@@ -74,16 +87,21 @@ public:
 
 class BST {
 private:
+	/*
+		@brief Node is an object that stores a course object and a left and right pointer reference.
+	*/
 	struct Node {
 		Course course;
 		Node* left;
 		Node* right;
 
+		// Default constructor
 		Node() {
 			left = nullptr;
 			right = nullptr;
 		}
 
+		// Overloaded constructor adding course to Node
 		Node(Course course) : Node() {
 			this->course = course;
 		}
@@ -102,11 +120,17 @@ public:
 	void Search(string courseNumber);
 };
 
+/*
+	@brief Adds Node to BST using standard ordering procedure for BST
+	@param node should be root of tree so that the new course will be added in the correct spot on the tree
+	@param course is the Course object to be added to the tree.
+*/
 BST::Node* BST::addNode(Node* node, Course course) {
 
-	if (node == nullptr)
+	if (node == nullptr) // If the node is null then a new node is added to tree in current place
 		return new Node(course);
 	
+	// If course number is smaller than the current nodes course number traversal is to the left otherwise to the right
 	if (course.GetCourseNumber().compare(node->course.GetCourseNumber()) < 0)
 		node->left = addNode(node->left, course);
 	else
@@ -115,6 +139,10 @@ BST::Node* BST::addNode(Node* node, Course course) {
 	return node;
 }
 
+/*
+	@brief Prints all courses in the tree using in order traversal.
+	@param node should be root of tree so all nodes will be printed.
+*/
 void BST::inOrder(Node* node) {
 	if (node == nullptr)
 		return;
@@ -129,6 +157,11 @@ void BST::inOrder(Node* node) {
 	inOrder(node->right);
 }
 
+/*
+	@brief Searches Course objects to find a matching course number, if found course details will be printed.
+	@param node should be root of tree so a correct check of nodes is conducted.
+	@param courseNumber is the Course to be searched
+*/
 void BST::search(Node* node, string courseNumber) {
 	if (node == nullptr)
 		return;
@@ -149,10 +182,15 @@ void BST::search(Node* node, string courseNumber) {
 		search(node->right, courseNumber);
 }
 
+// Default constructor
 BST::BST() {
 	root = nullptr;
 }
 
+/*
+	@brief Adds Course to BST
+	@param course is the Course object to be added.
+*/
 void BST::Add(Course course) {
 	if (root == nullptr) {
 		root = new Node(course);
@@ -162,10 +200,17 @@ void BST::Add(Course course) {
 	addNode(root, course);
 }
 
+/*
+	@brief Prints a list of all courses.
+*/
 void BST::PrintList() {
 	inOrder(root);
 }
 
+/*
+	@brief Searches for course with matching course number, if found courses details will be printed.
+	@param courseNumber is the field that will be searched.
+*/
 void BST::Search(string courseNumber) {
 	search(root, courseNumber);
 }

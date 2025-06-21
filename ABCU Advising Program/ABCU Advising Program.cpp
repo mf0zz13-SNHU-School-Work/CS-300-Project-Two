@@ -44,11 +44,133 @@ public:
 		this->preReqs.push_back(courseName);
 	}
 
+	string GetCourseNumber() {
+		return courseNumber;
+	}
+
+	string PrintCourseNumber() {
+		cout << courseNumber;
+	}
+
+	string PrintCourseName() {
+		cout << courseName;
+	}
+
+	vector<string> PrintPreReqs() {
+		int size = preReqs.size();
+
+		for (int i = 0; i < size; i++) {
+			cout << preReqs[i];
+			if (i != size - 1)
+				cout << ", ";
+		}
+	}
+
 	Course() {
 		courseNumber = "unknown";
 		courseName = "unknown";
 	}
 };
+
+class BST {
+private:
+	struct Node {
+		Course course;
+		Node* left;
+		Node* right;
+
+		Node() {
+			left = nullptr;
+			right = nullptr;
+		}
+
+		Node(Course course) : Node() {
+			this->course = course;
+		}
+	};
+
+	Node* root;
+
+	Node* addNode(Node* node, Course course);
+	void inOrder(Node* node);
+	void search(Node* node, string courseNumber);
+
+public:
+	BST();
+	void Add(Course course);
+	void PrintList();
+	void Search(string courseNumber);
+};
+
+BST::Node* BST::addNode(Node* node, Course course) {
+
+	if (node == nullptr)
+		return new Node(course);
+	
+	if (course.GetCourseNumber().compare(node->course.GetCourseNumber()) < 0)
+		node->left = addNode(node->left, course);
+	else
+		node->right = addNode(node->right, course);
+
+	return node;
+}
+
+void BST::inOrder(Node* node) {
+	if (node == nullptr)
+		return;
+	inOrder(node->left);
+
+	Course course = node->course;
+	course.PrintCourseNumber();
+	cout << ", ";
+	course.PrintCourseName();
+	cout << endl;
+
+	inOrder(node->right);
+}
+
+void BST::search(Node* node, string courseNumber) {
+	if (node == nullptr)
+		return;
+
+	Course course = node->course;
+
+	if (course.GetCourseNumber() == courseNumber) {
+		course.PrintCourseNumber();
+		cout << ", ";
+		course.PrintCourseName();
+		cout << "\nPrerequisites: ";
+		course.PrintPreReqs();
+		cout << endl;
+	}
+	else if (courseNumber.compare(course.GetCourseNumber()) < 0)
+		search(node->left, courseNumber);
+	else
+		search(node->right, courseNumber);
+}
+
+BST::BST() {
+	root = nullptr;
+}
+
+void BST::Add(Course course) {
+	if (root == nullptr) {
+		root = new Node(course);
+		return;
+	}
+
+	addNode(root, course);
+}
+
+void BST::PrintList() {
+	inOrder(root);
+}
+
+void BST::Search(string courseNumber) {
+	search(root, courseNumber);
+}
+
+
 
 int main()
 {

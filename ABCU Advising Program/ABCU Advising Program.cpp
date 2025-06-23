@@ -321,6 +321,7 @@ int main()
 
 	do
 	{
+		// Menu Items
 		cout << endl;
 		cout << "1. Load Data Structure." << endl;
 		cout << "2. Print Course List." << endl;
@@ -328,7 +329,7 @@ int main()
 		cout << "9. Exit.\n" << endl;
 		cout << "What would you like to do? ";
 		cin >> userInput;
-		cin.ignore();
+		cin.ignore(); // Clearing input buffer
 
 		switch (userInput) {
 		case 1:
@@ -343,7 +344,7 @@ int main()
 		case 3:
 			cout << "What course do you want to know about? ";
 			cin >> courseName;
-			for (int i = 0; i < courseName.length(); i++)
+			for (int i = 0; i < courseName.length(); i++) // Changing case of input to upper to ensure propper search
 				courseName[i] = toupper(courseName[i]);
 			courses.Search(courseName);
 			break;
